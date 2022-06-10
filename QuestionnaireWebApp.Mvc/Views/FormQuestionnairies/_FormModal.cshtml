@@ -1,0 +1,86 @@
+@using QuestionnaireWebApp.Core.Enums
+@model FormModalViewModel
+
+@{
+    Layout = null;
+}
+
+<div class="modal-header">
+  <h5 class="modal-title">Просмотр пройденного опроса</h5>
+  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+    <div class="card">
+        <h5 class="card-header">Анкета</h5>
+        <div class="card-body">
+            
+            <h5 class="card-title">@Model.QuestionnaireName</h5>
+
+            <div class="col-md-4">
+                <label for="validationCustom01" class="form-label">Имя</label>
+                <input disabled="disabled" value="@Model.Person.Name" id="personeName" type="text" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+                <label for="validationCustom01" class="form-label">Возраст</label>
+                <input disabled="disabled" value="@Model.Person.Age" id="personAge" type="text" class="form-control" required>
+            </div>
+            <div class="col-md-4">
+                <label for="validationCustom01" class="form-label">Пол</label>
+                <div>
+                    @(Model.Person.Sex == Sex.Male ? "Муж." : "Жен.")
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="questionnaire">
+        <div id="Answers" class="questions mt-5">
+
+            @foreach (var formAnswerGroup in Model.FormAnswers.GroupBy(x => x.Question))
+            {
+                <div class="card mb-3">
+                    <div class="card-header">
+                        Вопрос
+                    </div>
+                    <div class="card-body question">
+                        <p class="question-name">@formAnswerGroup.Key.Name</p>
+
+                        @switch (formAnswerGroup.Key.Type)
+                        {
+
+                            case QuestionType.Single:
+                            case QuestionType.Many:
+                                <ul class="answers list-group">
+                                    @foreach (var variantAnswer in formAnswerGroup.Key.VariantAnswers)
+                                    {
+                                        switch (formAnswerGroup.Key.Type)
+                                        {
+                                            case QuestionType.Single:
+                                                <li class="list-group-item d-flex align-items-center">
+                                                    <input class="form-check-input me-1 answer-check" type="radio" disabled @(formAnswerGroup.Any(x => x.Answer.Name == variantAnswer.Name) ? "checked" : "")>
+                                                    <span class="form-control form-control-sm answer-name">@variantAnswer.Name</span>
+                                                </li>
+                                                break;
+
+                                            case QuestionType.Many:
+                                                <li class="list-group-item d-flex align-items-center">
+                                                    <input class="form-check-input me-1 answer-check" type="checkbox" disabled @(formAnswerGroup.Any(x => x.Answer.Name == variantAnswer.Name) ? "checked" : "")>
+                                                    <span class="form-control form-control-sm answer-name">@variantAnswer.Name</span>
+                                                </li>
+                                                break;
+                                        }
+                                    }
+                                </ul>
+                                break;
+
+                            case QuestionType.Our:
+                                <p>Введите свой ответ</p>
+                                <input class="form-control form-control-sm our-answer" type="text" disabled value="@formAnswerGroup.First().OurAnswer">
+                                break;
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

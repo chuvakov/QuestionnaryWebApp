@@ -1,0 +1,261 @@
+@using QuestionnaireWebApp.Models;
+@using QuestionnaireWebApp.Core.Enums
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model ConstructorViewModel
+
+@{
+    ViewData["Title"] = "Создание опроса"; //Это приписка для каждой страницы для тега Title(отображает название вкладки) в HTML
+    //ViewData и ViewBag используются как Портал через который каждая страница может довавить свое наименование на Шаблонной странице
+}
+
+<style> 
+    .constructor-menu {
+    position: fixed;
+    right: 100px;
+    top: 50%;
+    }
+</style> @*?!?!?!?!?!?*@
+
+<h2>Конструктор</h2>
+
+<div id="questionnaire" class="card" data-id="@(Model?.Questionnaire?.Id ?? 0)"> @*сохраняем ИД, вариант передачи данных через тег data*@
+    <h5 class="card-header">Опросник</h5>
+    <div class="card-body">
+        <input id="questionnaire-name" class="form-control form-control-lg mb-3" type="text" placeholder="Название" value="@(Model != null ? Model.Questionnaire.Name : "")">
+        <input id="questionnaire-description" class="form-control form-control-sm" type="text" placeholder="Описание"> 
+    </div>
+</div>
+
+<div id="Questions" class="questions mt-5">
+    @if (Model is not null)
+    {
+        foreach (var question in Model.Questionnaire.Questions)
+        {
+            <div class="card mb-3">
+                <div class="card-header">
+                    Вопрос
+                </div>
+                <div class="card-body">
+                    <input class="form-control question-name" type="text" value="@question.Name" aria-label="default input example">
+                    <select class="form-select mt-3 type-answer" aria-label="Default select example">
+                        @{
+                            var values = new Dictionary<string,string>()
+                            {   {"single", "Одиночный выбор"},
+                                {"many", "Множественный выбор"},
+                                {"our", "Свой ответ"}
+                            
+                            };
+                            foreach (var value in values)
+                            {
+                                if (value.Key == question.Type.ToString())
+                                {
+                                    <option value="@value.Key" selected>@value.Value</option>
+                                }
+                                else
+                                {
+                                    <option value="@value.Key">@value.Value</option>
+                                }
+                            }
+                        }
+                        
+                    </select>
+
+                    <ul class="answers list-group">
+                        @foreach (var variantAnswer in question.VariantAnswers)
+                        {
+                            switch (question.Type) {
+                
+                                case QuestionType.Single :
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
+                                        <input class="form-control form-control-sm answer-name" type="text" value="@variantAnswer.Name" aria-label=".form-control-sm example">                            
+                                    </li>
+                                    break;
+                                    
+                                case QuestionType.Many :
+                                    <li class="list-group-item d-flex align-items-center">
+                                        <input disabled class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                        <input class="form-control form-control-sm answer-name" type="text" value="@variantAnswer.Name" aria-label=".form-control-sm example">                            
+                                    </li>
+                                    break;
+                            } 
+                        }
+                        
+                                <li class="list-group-item d-flex align-items-center add-answer-variant">
+                                 <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
+                                 Добавить вариант ответа
+                               </li>  
+                        
+                    </ul>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<ul class="list-group constructor-menu">
+    <li class="list-group-item">
+        <button id="AddQuestion" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Добавить вопрос">
+            <i class="fa-solid fa-circle-plus"></i>
+        </button>
+    </li>
+    
+    <li class="list-group-item">
+        <button id="Save" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Сохранить опросник">
+              <i class="fa-solid fa-floppy-disk"></i>
+         </button>
+    </li>
+</ul>
+
+@section Scripts{
+    <script>
+    $(function() {
+        
+        let questionnaire = {
+            questions : []
+        };
+        
+        //Подключаем tooltip
+        $('[data-bs-toggle="tooltip"]').tooltip()
+        
+        //Обработка события клик при добавлении вопроса
+        $('#AddQuestion').click(function() {
+            $('#Questions').append(`
+                <div class="card mb-3">
+                    <div class="card-header">
+                        Вопрос
+                    </div>
+                    <div class="card-body">
+                        <input class="form-control question-name" type="text" placeholder="Название" aria-label="default input example">
+                        <select class="form-select mt-3 type-answer" aria-label="Default select example">
+                            <option selected disabled>Тип вариантов ответа</option>
+                            <option value="single">Одиночный выбор</option>
+                            <option value="many">Множественный выбор</option>
+                            <option value="our">Свой ответ</option>
+                        </select>
+        
+                      <ul class="answers list-group">
+                        
+                      </ul>
+                    </div>
+                </div>
+            `);
+            
+        });
+        
+        //Обработка события изменения значения в выпадающем списке
+        $(document).on('change', '.type-answer', function() {
+            let selectedValue = this.value;
+            let $answers = $(this).next();
+            
+            switch (selectedValue) {
+                case 'single' : 
+                    $answers.empty();
+                    $answers.append(`
+                                   <li class="list-group-item d-flex align-items-center">
+                                     <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
+                                     <input class="form-control form-control-sm answer-name" type="text" placeholder="Название ответа" aria-label=".form-control-sm example">
+                                   </li>   
+                                    <li class="list-group-item d-flex align-items-center add-answer-variant">
+                                     <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
+                                     Добавить вариант ответа
+                                   </li>   
+                                   `)
+                    break;
+                    
+                case 'many' :
+                    $answers.empty();
+                    $answers.append(`
+                    <li class="list-group-item d-flex align-items-center">
+                     <input disabled class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                     <input class="form-control form-control-sm answer-name" type="text" placeholder="Название ответа" aria-label=".form-control-sm example">
+                   </li>   
+                    <li class="list-group-item d-flex align-items-center add-answer-variant">
+                     <input disabled class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                     Добавить вариант ответа
+                   </li>  
+                    `)
+                break;
+                
+                case 'our' :
+                    $answers.empty();             
+            }              
+        })
+        
+        //Добавление варианта ответа
+        $(document).on('click', '.add-answer-variant', function (){
+            let selectedTypeAnswer = $(this).parent().prev().val();
+            
+            switch (selectedTypeAnswer) {
+                
+                case 'single' :
+                    $(this).before(`
+                                  <li class="list-group-item d-flex align-items-center">
+                                   <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
+                                   <input class="form-control form-control-sm answer-name" type="text" placeholder="Название ответа" aria-label=".form-control-sm example">                            
+                                 </li>         
+                                `)
+                    break;
+                case 'many' :
+                    $(this).before(`
+                                  <li class="list-group-item d-flex align-items-center">
+                                   <input disabled class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                   <input class="form-control form-control-sm answer-name" type="text" placeholder="Название ответа" aria-label=".form-control-sm example">                            
+                                 </li>         
+                                `)
+            }   
+            
+            
+        })
+        
+        //Обработка клика кнопки сохранения опросника
+        $('#Save').click(function () {
+            
+            questionnaire.name = $('#questionnaire-name').val();
+            questionnaire.description = $('#questionnaire-description').val();
+            
+            let $questionNames = $('.question-name');
+            for (let questionName of $questionNames) {
+                
+                
+                let question = {
+                    name: $(questionName).val(),
+                    type: $(questionName).next().val()                    
+                };
+                
+                let $answers = $(questionName).next().next();
+                let answerNames = $answers.find('.answer-name');
+                
+                if (answerNames.length > 0){
+                   question.variantAnswers = [];
+                   
+                   for (let answerName of answerNames){
+                       question.variantAnswers.push({
+                       name : $(answerName).val()
+                       });
+                   }
+                }
+                
+                questionnaire.questions.push(question);
+            }
+            questionnaire.id = $('#questionnaire').data('id');
+            
+            $.ajax({
+                url : '/Constructor/Save/',
+                method : 'post',
+                data : {
+                    input : questionnaire
+                },
+                success : function () {
+                    alert('успешно')
+                },
+                error : function (request, exception) {
+                    console.log(request);
+                    console.log(exception);
+                }
+            });
+            
+        });
+    });
+    </script>
+}
