@@ -1,4 +1,3 @@
-@using QuestionnaireWebApp.Models;
 @using QuestionnaireWebApp.Core.Enums
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model ConstructorViewModel
@@ -11,19 +10,26 @@
 <style> 
     .constructor-menu {
     position: fixed;
-    right: 100px;
+    right: 70px;
     top: 50%;
     }
 </style> @*?!?!?!?!?!?*@
 
-<h2>Конструктор</h2>
+<h2 class="mt-5">Конструктор</h2>
 
-<div id="questionnaire" class="card" data-id="@(Model?.Questionnaire?.Id ?? 0)"> @*сохраняем ИД, вариант передачи данных через тег data*@
+<div id="questionnaire" class="card" data-id="@(Model?.Questionnaire?.Id ?? 0)">
+    @*сохраняем ИД, вариант передачи данных через тег data*@
     <h5 class="card-header">Опросник</h5>
     <div class="card-body">
-        <input id="questionnaire-name" class="form-control form-control-lg mb-3" type="text" placeholder="Название" value="@(Model != null ? Model.Questionnaire.Name : "")">
-        <input id="questionnaire-description" class="form-control form-control-sm" type="text" placeholder="Описание"> 
+        <input id="questionnaire-name" class="form-control form-control-lg" type="text" placeholder="Название" value="@(Model != null ? Model.Questionnaire.Name : "")">
+        <div id="NameInvalidFeedback" class="invalid-feedback">
+            Название не введено!
+        </div>
+        <input id="questionnaire-description" class="form-control form-control-sm mt-3" type="text" placeholder="Описание">
     </div>
+</div>
+<div id="questionsInvalidFeedback" class="invalid-feedback">
+    Не добавлены вопросы!
 </div>
 
 <div id="Questions" class="questions mt-5">
@@ -39,11 +45,11 @@
                     <input class="form-control question-name" type="text" value="@question.Name" aria-label="default input example">
                     <select class="form-select mt-3 type-answer" aria-label="Default select example">
                         @{
-                            var values = new Dictionary<string,string>()
-                            {   {"single", "Одиночный выбор"},
+                            var values = new Dictionary<string, string>
+                            {
+                                {"single", "Одиночный выбор"},
                                 {"many", "Множественный выбор"},
                                 {"our", "Свой ответ"}
-                            
                             };
                             foreach (var value in values)
                             {
@@ -57,35 +63,35 @@
                                 }
                             }
                         }
-                        
+
                     </select>
 
                     <ul class="answers list-group">
                         @foreach (var variantAnswer in question.VariantAnswers)
                         {
-                            switch (question.Type) {
-                
-                                case QuestionType.Single :
+                            switch (question.Type)
+                            {
+                                case QuestionType.Single:
                                     <li class="list-group-item d-flex align-items-center">
                                         <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
-                                        <input class="form-control form-control-sm answer-name" type="text" value="@variantAnswer.Name" aria-label=".form-control-sm example">                            
+                                        <input class="form-control form-control-sm answer-name" type="text" value="@variantAnswer.Name" aria-label=".form-control-sm example">
                                     </li>
                                     break;
-                                    
-                                case QuestionType.Many :
+
+                                case QuestionType.Many:
                                     <li class="list-group-item d-flex align-items-center">
                                         <input disabled class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                        <input class="form-control form-control-sm answer-name" type="text" value="@variantAnswer.Name" aria-label=".form-control-sm example">                            
+                                        <input class="form-control form-control-sm answer-name" type="text" value="@variantAnswer.Name" aria-label=".form-control-sm example">
                                     </li>
                                     break;
-                            } 
+                            }
                         }
-                        
-                                <li class="list-group-item d-flex align-items-center add-answer-variant">
-                                 <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
-                                 Добавить вариант ответа
-                               </li>  
-                        
+
+                        <li class="list-group-item d-flex align-items-center add-answer-variant">
+                            <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
+                            Добавить вариант ответа
+                        </li>
+
                     </ul>
                 </div>
             </div>
@@ -99,11 +105,11 @@
             <i class="fa-solid fa-circle-plus"></i>
         </button>
     </li>
-    
+
     <li class="list-group-item">
         <button id="Save" class="btn" data-bs-toggle="tooltip" data-bs-placement="left" title="Сохранить опросник">
-              <i class="fa-solid fa-floppy-disk"></i>
-         </button>
+            <i class="fa-solid fa-floppy-disk"></i>
+        </button>
     </li>
 </ul>
 
@@ -111,28 +117,40 @@
     <script>
     $(function() {
         
+        $('body').tooltip({
+            selector: '[data-bs-toggle="tooltip"]',
+            trigger: 'hover'
+        });
+        
         let questionnaire = {
             questions : []
         };
         
-        //Подключаем tooltip
-        $('[data-bs-toggle="tooltip"]').tooltip()
-        
         //Обработка события клик при добавлении вопроса
         $('#AddQuestion').click(function() {
+            
+            $('#questionsInvalidFeedback').removeClass('d-block');
+            
             $('#Questions').append(`
                 <div class="card mb-3">
-                    <div class="card-header">
+                    <div class="card-header d-flex align-items-center justify-content-between">
                         Вопрос
+                        <i data-bs-toggle="tooltip" title="Удалить вопрос" class="fa-solid fa-trash-can text-danger remove" role="button"></i>
                     </div>
                     <div class="card-body">
                         <input class="form-control question-name" type="text" placeholder="Название" aria-label="default input example">
+                        <div class="invalid-feedback">
+                            Название не введено!
+                        </div>
                         <select class="form-select mt-3 type-answer" aria-label="Default select example">
                             <option selected disabled>Тип вариантов ответа</option>
                             <option value="single">Одиночный выбор</option>
                             <option value="many">Множественный выбор</option>
                             <option value="our">Свой ответ</option>
                         </select>
+                        <div class="invalid-feedback">
+                            Не выбран тип варианта ответа!
+                        </div>
         
                       <ul class="answers list-group">
                         
@@ -146,15 +164,22 @@
         //Обработка события изменения значения в выпадающем списке
         $(document).on('change', '.type-answer', function() {
             let selectedValue = this.value;
-            let $answers = $(this).next();
+            let $answers = $(this).next().next();
+            
+            $(this).next().removeClass('d-block');
             
             switch (selectedValue) {
                 case 'single' : 
                     $answers.empty();
                     $answers.append(`
-                                   <li class="list-group-item d-flex align-items-center">
-                                     <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
-                                     <input class="form-control form-control-sm answer-name" type="text" placeholder="Название ответа" aria-label=".form-control-sm example">
+                                   <li class="list-group-item">
+                                   <div class="d-flex align-items-center">
+                                        <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
+                                        <input class="form-control form-control-sm answer-name" type="text" placeholder="Название ответа" aria-label=".form-control-sm example">
+                                   </div>                                     
+                                   <div class="invalid-feedback">
+                                       Не введено название ответа!
+                                   </div>
                                    </li>   
                                     <li class="list-group-item d-flex align-items-center add-answer-variant">
                                      <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
@@ -166,9 +191,14 @@
                 case 'many' :
                     $answers.empty();
                     $answers.append(`
-                    <li class="list-group-item d-flex align-items-center">
-                     <input disabled class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                     <input class="form-control form-control-sm answer-name" type="text" placeholder="Название ответа" aria-label=".form-control-sm example">
+                    <li class="list-group-item">
+                    <div class="d-flex align-items-center">
+                        <input disabled class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                        <input class="form-control form-control-sm answer-name" type="text" placeholder="Название ответа" aria-label=".form-control-sm example">
+                    </div>
+                     <div class="invalid-feedback">
+                        Не введено название ответа!
+                     </div>
                    </li>   
                     <li class="list-group-item d-flex align-items-center add-answer-variant">
                      <input disabled class="form-check-input me-1" type="checkbox" value="" aria-label="...">
@@ -184,28 +214,42 @@
         
         //Добавление варианта ответа
         $(document).on('click', '.add-answer-variant', function (){
-            let selectedTypeAnswer = $(this).parent().prev().val();
+            let selectedTypeAnswer = $(this).parent().prev().prev().val();
             
             switch (selectedTypeAnswer) {
                 
                 case 'single' :
                     $(this).before(`
-                                  <li class="list-group-item d-flex align-items-center">
-                                   <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
-                                   <input class="form-control form-control-sm answer-name" type="text" placeholder="Название ответа" aria-label=".form-control-sm example">                            
+                                  <li class="list-group-item">
+                                    <div class="d-flex align-items-center">
+                                        <input disabled class="form-check-input me-1" type="radio" value="" aria-label="...">
+                                        <input class="form-control form-control-sm answer-name" type="text" placeholder="Название ответа" aria-label=".form-control-sm example"> 
+                                    </div>                                     
+                                    <div class="invalid-feedback">
+                                        Не введено название ответа!
+                                    </div>
                                  </li>         
                                 `)
                     break;
                 case 'many' :
                     $(this).before(`
-                                  <li class="list-group-item d-flex align-items-center">
-                                   <input disabled class="form-check-input me-1" type="checkbox" value="" aria-label="...">
-                                   <input class="form-control form-control-sm answer-name" type="text" placeholder="Название ответа" aria-label=".form-control-sm example">                            
+                                  <li class="list-group-item">
+                                  <div class="d-flex align-items-center">
+                                       <input disabled class="form-check-input me-1" type="checkbox" value="" aria-label="...">
+                                       <input class="form-control form-control-sm answer-name" type="text" placeholder="Название ответа" aria-label=".form-control-sm example"> 
+                                  </div>                                    
+                                    <div class="invalid-feedback">
+                                        Не введено название ответа!
+                                    </div>
                                  </li>         
                                 `)
-            }   
-            
-            
+            }             
+        })      
+        
+        //Обработка клика по корзине на вопросе
+        $(document).on('click', '.remove', function () {
+            $(this).tooltip('hide');
+            $(this).parent().parent().remove();
         })
         
         //Обработка клика кнопки сохранения опросника
@@ -214,25 +258,57 @@
             questionnaire.name = $('#questionnaire-name').val();
             questionnaire.description = $('#questionnaire-description').val();
             
+            if (questionnaire.name == '') {
+                $('#NameInvalidFeedback').addClass('d-block');
+                return;
+            }
+            $('#NameInvalidFeedback').removeClass('d-block');
+            
             let $questionNames = $('.question-name');
+            
+            if ($questionNames.length == 0) {
+                $('#questionsInvalidFeedback').addClass('d-block');
+                return;
+            }            
+            
             for (let questionName of $questionNames) {
+                
+                if ($(questionName).val() == '') {
+                    $(questionName).next().addClass('d-block');
+                    return;
+                }                 
+                $(questionName).next().removeClass('d-block');                
+                
+                let $selectTypeQuestion = $(questionName).next().next();
+                
+                if($selectTypeQuestion.val() == null) {
+                    $selectTypeQuestion.next().addClass('d-block');
+                    return;
+                }                 
+                $selectTypeQuestion.next().removeClass('d-block');
                 
                 
                 let question = {
                     name: $(questionName).val(),
-                    type: $(questionName).next().val()                    
+                    type: $selectTypeQuestion.val()
                 };
                 
-                let $answers = $(questionName).next().next();
+                let $answers = $(questionName).next().next().next().next();
                 let answerNames = $answers.find('.answer-name');
                 
                 if (answerNames.length > 0){
                    question.variantAnswers = [];
                    
                    for (let answerName of answerNames){
+                       if ($(answerName).val() == '') {
+                           $(answerName).parent().next().addClass('d-block');
+                           return;
+                       }
+                       $(answerName).parent().next().removeClass('d-block');
+                       
                        question.variantAnswers.push({
-                       name : $(answerName).val()
-                       });
+                           name : $(answerName).val()
+                       });                       
                    }
                 }
                 
@@ -240,7 +316,7 @@
             }
             questionnaire.id = $('#questionnaire').data('id');
             
-            $.ajax({
+            /*$.ajax({
                 url : '/Constructor/Save/',
                 method : 'post',
                 data : {
@@ -253,7 +329,7 @@
                     console.log(request);
                     console.log(exception);
                 }
-            });
+            });*/
             
         });
     });

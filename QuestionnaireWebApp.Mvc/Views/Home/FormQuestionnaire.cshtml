@@ -76,12 +76,18 @@
                                     }
                                 }
                             </ul>
+                            <div class="invalid-feedback">
+                                Не выбран ответ!
+                            </div>
                                 
                             break;
                                 
                         case QuestionType.Our :
                             <p>Введите свой ответ</p>
                             <input class="form-control form-control-sm our-answer" type="text">
+                            <div class="invalid-feedback">
+                                Не введен ответ!
+                            </div>
                             break;
                     }
                 </div>
@@ -140,24 +146,41 @@
             
             let $questions = $('.question');
             for (let question of $questions) {
-                let questionId = $(question).data('id');
-                let questionType = $(question).data('type');
+                let questionId = $(question).data('id'),
+                    questionType = $(question).data('type');                
                 
                 if (questionType == 'Our') {
+                    let $ourAnswer = $(question).find('.our-answer');
+                    
+                    if ($ourAnswer.val() == '') {
+                        $ourAnswer.next().addClass('d-block');
+                        return;
+                    } else {
+                        $ourAnswer.next().removeClass('d-block');
+                    }
+                        
                     form.answers.push({
                         questionId: questionId,
-                        ourAnswer: $(question).find('.our-answer').val()                    
+                        ourAnswer: $ourAnswer.val()
                     })
                 } else {
-                    let $selectedAnswers = $(question).find('.answer-check:checked');                    
-                    for (let selectedAnswer of $selectedAnswers){
+                    let selectedAnswers = $(question).find('.answer-check:checked'); 
+                    
+                    if (selectedAnswers.length == 0) {
+                        $(question).find('.invalid-feedback').addClass('d-block');
+                        return;
+                    } else {
+                        $(question).find('.invalid-feedback').removeClass('d-block');
+                    }
+                    
+                    for (let selectedAnswer of selectedAnswers){                        
                         form.answers.push({
                             answerId: $(selectedAnswer).data('id'),
                             questionId: questionId
                         })    
                     }
-                }
-            }                
+                }               
+            }
             
             $.ajax({
                 url : '/Home/SaveFormQuestionnaire/',
