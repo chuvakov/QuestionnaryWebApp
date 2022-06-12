@@ -10,11 +10,15 @@
   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 <div class="modal-body">
+    
+    <div class="text-center mt-3">
+        <h5>@Model.QuestionnaireName</h5>
+        <p>@Model.QuestionnaireDescription</p>
+    </div>
+    
     <div class="card">
         <h5 class="card-header">Анкета</h5>
         <div class="card-body">
-            
-            <h5 class="card-title">@Model.QuestionnaireName</h5>
 
             <div class="col-md-4">
                 <label for="validationCustom01" class="form-label">Имя</label>

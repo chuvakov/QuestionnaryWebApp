@@ -42,8 +42,11 @@ public class EntityToViewModelProfile : Profile
                 FormModalViewModel => FormModalViewModel.QuestionnaireName,
                 memberConfigurationExpression => memberConfigurationExpression
                     .MapFrom(form => form.Questionnaire.Name)
+            )
+            .ForMember(
+                FormModalViewModel => FormModalViewModel.QuestionnaireDescription,
+                memberConfigurationExpression => memberConfigurationExpression
+                    .MapFrom(form => form.Questionnaire.Description)
             );
-        
-        
     }
 }

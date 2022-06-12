@@ -5,6 +5,7 @@ namespace QuestionnaireWebApp.Core.Models;
 public class Questionnaire : Entity
 {
     public string Name { get; set; }
+    public string Description { get; set; }
     public ICollection<Question> Questions { get; set; }
 
     private void PrintQuestion(Question question)

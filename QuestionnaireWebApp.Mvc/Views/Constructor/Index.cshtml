@@ -13,7 +13,7 @@
     right: 70px;
     top: 50%;
     }
-</style> @*?!?!?!?!?!?*@
+</style> 
 
 <h2 class="mt-5">Конструктор</h2>
 
@@ -316,20 +316,20 @@
             }
             questionnaire.id = $('#questionnaire').data('id');
             
-            /*$.ajax({
+            $.ajax({
                 url : '/Constructor/Save/',
                 method : 'post',
                 data : {
                     input : questionnaire
                 },
                 success : function () {
-                    alert('успешно')
+                    location.href = '/Home'
                 },
                 error : function (request, exception) {
                     console.log(request);
                     console.log(exception);
                 }
-            });*/
+            });
             
         });
     });
