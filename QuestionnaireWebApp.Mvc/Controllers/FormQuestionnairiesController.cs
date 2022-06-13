@@ -2,6 +2,7 @@ using System.Net;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using QuestinaryWebApp.Extensions;
 using QuestionnaireWebApp.Core;
 using QuestionnaireWebApp.Models;
 
@@ -10,8 +11,8 @@ namespace QuestionnaireWebApp.Controllers;
 public class FormQuestionnairiesController : Controller
 {
     private readonly QuestionnaireContext _context;
-    private readonly IMapper _mapper;
     private readonly ILogger<FormQuestionnairiesController> _logger;
+    private readonly IMapper _mapper;
 
     public FormQuestionnairiesController(
         QuestionnaireContext context,
@@ -38,12 +39,11 @@ public class FormQuestionnairiesController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e, e.Message);
+            _logger.Error(e);
             return StatusCode((int) HttpStatusCode.InternalServerError);
         }
-        
     }
-    
+
     [HttpGet("[controller]/[action]/{id}")]
     public IActionResult FormModal(int id)
     {
@@ -64,9 +64,8 @@ public class FormQuestionnairiesController : Controller
         }
         catch (Exception e)
         {
-            _logger.LogError(e, e.Message);
+            _logger.Error(e);
             return StatusCode((int) HttpStatusCode.InternalServerError);
         }
-        
     }
 }
