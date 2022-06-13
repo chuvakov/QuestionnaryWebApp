@@ -25,7 +25,7 @@
         <div id="NameInvalidFeedback" class="invalid-feedback">
             Название не введено!
         </div>
-        <input id="questionnaire-description" class="form-control form-control-sm mt-3" type="text" placeholder="Описание">
+        <input id="questionnaire-description" class="form-control form-control-sm mt-3" type="text" placeholder="Описание" value="@(Model != null ? Model.Questionnaire.Description : "")">
     </div>
 </div>
 <div id="questionsInvalidFeedback" class="invalid-feedback">
