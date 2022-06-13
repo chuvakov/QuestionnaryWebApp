@@ -19,6 +19,8 @@ JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
 };
 
+builder.Logging.AddLog4Net("log4net.config");
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
