@@ -2,7 +2,7 @@ using QuestinaryWebApp.Dto;
 
 namespace QuestionnaireWebApp.Models;
 
-public class FormQuestionnaireViewModel
+public class PassQuestionnaireViewModel
 {
     public QuestionnaireDto Questionnaire { get; set; }
 }

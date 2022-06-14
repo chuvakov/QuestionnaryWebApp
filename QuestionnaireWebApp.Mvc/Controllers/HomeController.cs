@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuestinaryWebApp.Dto;
 using QuestinaryWebApp.Extensions;
+using QuestionnaireWebApp.Views.Shared.Components.Questionnaire;
 using QuestionnaireWebApp.Core;
 using QuestionnaireWebApp.Core.Models;
 using QuestionnaireWebApp.Models;
@@ -66,7 +67,7 @@ public class HomeController : Controller
 
     //Кнопка прохождения опросника
     [HttpGet("[controller]/[action]/{id}")]
-    public IActionResult FormQuestionnaire(int id)
+    public IActionResult PassQuestionnaire(int id)
     {
         try
         {
@@ -76,7 +77,7 @@ public class HomeController : Controller
                 .FirstOrDefault(questionnaire => questionnaire.Id == id);
 
             var questionnaireDto = _mapper.Map<QuestionnaireDto>(questionnaire);
-            var model = new FormQuestionnaireViewModel
+            var model = new PassQuestionnaireViewModel
             {
                 Questionnaire = questionnaireDto
             };

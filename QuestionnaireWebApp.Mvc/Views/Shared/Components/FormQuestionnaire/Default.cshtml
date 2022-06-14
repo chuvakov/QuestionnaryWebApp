@@ -1,0 +1,61 @@
+@using QuestionnaireWebApp.Core.Enums
+@model QuestinaryWebApp.Views.Shared.Components.FormQuestionnaire.FormQuestionnaireViewModel
+
+@{
+    string
+        name = "",
+        age = "",
+        disabled = "";
+
+    if (Model.Person != null)
+    {
+        name = Model.Person.Name;
+        age = Model.Person.Age.ToString();
+        disabled = "disabled";
+    }
+}
+
+<div class="card mt-3">
+    <h5 class="card-header">Анкета</h5>
+    <div class="card-body">
+
+        <div class="col-md-4">
+            <label for="validationCustom01" class="form-label">Имя</label>
+            <input id="personeName" type="text" @disabled class="form-control" required value="@name">
+            <div class="invalid-feedback">
+                Имя не введено!
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label for="validationCustom01" class="form-label">Возраст</label>
+            <input id="personAge" type="number" @disabled min="1" max="120" class="form-control" required value="@age">
+            <div id="PersonAgeFeedback" class="invalid-feedback">
+                Возраст не введен!
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label for="validationCustom01" class="form-label">Пол</label>
+            @if (Model.Person != null)
+            {
+                <div>
+                    @(Model.Person.Sex == Sex.Male ? "Муж." : "Жен.")
+                </div>
+            }
+            else
+            {
+                <div class="d-flex">
+                    <label class="form-check-label me-2" for="flexSwitchCheckDefault">М</label>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" role="switch" id="personSex">
+                    </div>
+                    <label class="form-check-label" for="flexSwitchCheckDefault">Ж</label>
+                </div>
+            }
+        </div>
+        
+        @if (Model.IsVisibleStartBtn)
+        {
+            <a id="start" href="#" class="btn btn-primary mt-3">Начать опрос</a>
+        }
+    </div>
+</div>

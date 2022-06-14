@@ -1,4 +1,5 @@
 using AutoMapper;
+using QuestionnaireWebApp.Views.Shared.Components.Questionnaire;
 using QuestionnaireWebApp.Core.Models;
 using QuestionnaireWebApp.Models;
 
@@ -10,7 +11,7 @@ public class EntityToViewModelProfile : Profile
     {
         CreateMap<Questionnaire, QuestionnaireViewModel>()
             .ForMember(
-                questionnaireViewModel => questionnaireViewModel.AmountQuestion, 
+                questionnaireViewModel => questionnaireViewModel.AmountQuestion,
                 memberConfigurationExpression => memberConfigurationExpression
                     .MapFrom(questionnaire => questionnaire.Questions.Count)
             );

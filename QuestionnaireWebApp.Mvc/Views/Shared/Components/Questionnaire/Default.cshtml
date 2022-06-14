@@ -1,0 +1,25 @@
+@using QuestionnaireWebApp.Views.Shared.Components.Questionnaire
+@model QuestionnaireViewModel
+
+<div class="card text-center" style="height: 226px">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <a span data-bs-toggle="tooltip" title="Редактировать опросник" asp-action="Index" asp-route-questionnaireId="@Model.Id" asp-controller="Constructor">
+            <i class="fa-solid fa-pen-to-square text-warning edit" role="button"></i>
+        </a>
+        Опросник
+        <i span data-bs-toggle="tooltip" title="Удалить опросник" class="fa-solid fa-trash-can text-danger remove" role="button" data-id="@Model.Id"></i>
+    </div>
+    <div class="card-body d-flex flex-column justify-content-between">
+        <h5 class="card-title">@Model.Name</h5>
+        <p class="card-text">@Model.Description</p>
+        <a class="btn btn-primary" asp-action="PassQuestionnaire" asp-route-id="@Model.Id" asp-controller="Home">Пройти опрос</a>
+    </div>
+    <div class="card-footer text-muted d-flex justify-content-between align-items-center">
+        <a data-bs-toggle="tooltip" title="Скачать опросник" asp-action="Download" asp-route-id="@Model.Id" asp-controller="Home">
+            <i class="fa-solid fa-file-arrow-down"></i>
+        </a>
+        Кол-во вопросов: @Model.AmountQuestion
+        <i data-id="@Model.Id" span data-bs-toggle="tooltip" title="Поделиться опросником" role="button" class="fa-solid fa-link share"></i>
+    </div>
+</div>
+

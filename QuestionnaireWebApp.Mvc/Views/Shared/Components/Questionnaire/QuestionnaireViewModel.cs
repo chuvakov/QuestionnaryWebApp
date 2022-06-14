@@ -1,4 +1,4 @@
-namespace QuestionnaireWebApp.Models;
+namespace QuestionnaireWebApp.Views.Shared.Components.Questionnaire;
 
 public class QuestionnaireViewModel
 {

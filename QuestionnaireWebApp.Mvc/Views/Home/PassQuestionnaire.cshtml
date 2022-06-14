@@ -1,5 +1,6 @@
+@using QuestinaryWebApp.Views.Shared.Components.FormQuestionnaire
 @using QuestionnaireWebApp.Core.Enums
-@model FormQuestionnaireViewModel
+@model PassQuestionnaireViewModel
 
 @{
     ViewData["Title"] = "Опросник";
@@ -10,43 +11,11 @@
     <p>@Model.Questionnaire.Description</p>
 </div>
 
-<div class="card mt-3">
-  <h5 class="card-header">Анкета</h5>
-    <div class="card-body">
-        
-        <div class="col-md-4">
-            <label for="validationCustom01" class="form-label">Имя</label>
-            <input id="personeName" type="text" class="form-control" required>
-            <div class="invalid-feedback">
-                Имя не введено!
-            </div>
-        </div>
-        <div class="col-md-4">
-            <label for="validationCustom01" class="form-label">Возраст</label>
-            <input id="personAge" type="number" min="1" max="120" class="form-control" required>
-            <div id="PersonAgeFeedback" class="invalid-feedback">
-                Возраст не введен!
-            </div>
-        </div>
-        <div class="col-md-4">
-            <label for="validationCustom01" class="form-label">Пол</label>
-            <div class="d-flex">
-                <label class="form-check-label me-2" for="flexSwitchCheckDefault">М</label>
-                <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" role="switch" id="personSex">
-                </div>
-                <label class="form-check-label" for="flexSwitchCheckDefault">Ж</label>
-            </div>
-        </div>
-
-        <a id="start" href="#" class="btn btn-primary mt-3">Начать опрос</a>
-    </div>
-</div>
-
+<vc:form-questionnaire model="@(new FormQuestionnaireViewModel {IsVisibleStartBtn = true})"/>
 
 <div id="questionnaire" class="d-none" data-id="@Model.Questionnaire.Id">
     <div id="Questions" class="questions mt-5">
-        
+
         @foreach (var question in Model.Questionnaire.Questions)
         {
             <div class="card mb-3">
@@ -55,11 +24,11 @@
                 </div>
                 <div class="card-body question" data-id="@question.Id" data-type="@question.Type">
                     <p class="question-name">@question.Name</p>
-                        
-                    @switch (question.Type) {
-                                        
-                        case QuestionType.Single :
-                        case QuestionType.Many :
+
+                    @switch (question.Type)
+                    {
+                        case QuestionType.Single:
+                        case QuestionType.Many:
                             <ul class="answers list-group">
                                 @foreach (var variantAnswer in question.VariantAnswers)
                                 {
@@ -84,10 +53,10 @@
                             <div class="invalid-feedback">
                                 Не выбран ответ!
                             </div>
-                                
+
                             break;
-                                
-                        case QuestionType.Our :
+
+                        case QuestionType.Our:
                             <p>Введите свой ответ</p>
                             <input class="form-control form-control-sm our-answer" type="text">
                             <div class="invalid-feedback">
@@ -104,35 +73,11 @@
 
 @section Scripts
 {
+    <script src="~/js/Shared/Components/FormQuestionnaire/Index.js"></script>
     <script>
-        $('#start').click(function () {
-            
-            let $personeName = $('#personeName'),
-                $personAge = $('#personAge');
-            
-            if ($personeName.val() == '') {
-                $personeName.addClass('is-invalid');
+        $('#start').click(function () {    
+            if (!isValidFormQuestionnaire())
                 return;
-            } else {
-                $personeName.removeClass('is-invalid');
-            }
-            
-            let personAge = $personAge.val();            
-            if (personAge == '') {
-                $personAge.addClass('is-invalid');                
-                $('#PersonAgeFeedback').text('Возраст не введен!')
-                return;
-            } else if (personAge <= 0 || personAge > 120) {
-                $personAge.addClass('is-invalid');                
-                $('#PersonAgeFeedback').text('Возраст не корректный!')
-                return;
-            } else {
-                $personAge.removeClass('is-invalid');
-            }
-            
-            $personeName.attr('disabled','');
-            $personAge.attr('disabled','');  
-            $('#personSex').attr('disabled',''); 
             
             $('#questionnaire').removeClass('d-none');
             $('#start').addClass('d-none');
@@ -204,5 +149,3 @@
         })
     </script>
 }
-
-

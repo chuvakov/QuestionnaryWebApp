@@ -1,4 +1,5 @@
 @using QuestionnaireWebApp.Core.Enums
+@using QuestinaryWebApp.Views.Shared.Components.FormQuestionnaire
 @model FormModalViewModel
 
 @{
@@ -16,26 +17,7 @@
         <p>@Model.QuestionnaireDescription</p>
     </div>
     
-    <div class="card">
-        <h5 class="card-header">Анкета</h5>
-        <div class="card-body">
-
-            <div class="col-md-4">
-                <label for="validationCustom01" class="form-label">Имя</label>
-                <input disabled="disabled" value="@Model.Person.Name" id="personeName" type="text" class="form-control" required>
-            </div>
-            <div class="col-md-4">
-                <label for="validationCustom01" class="form-label">Возраст</label>
-                <input disabled="disabled" value="@Model.Person.Age" id="personAge" type="text" class="form-control" required>
-            </div>
-            <div class="col-md-4">
-                <label for="validationCustom01" class="form-label">Пол</label>
-                <div>
-                    @(Model.Person.Sex == Sex.Male ? "Муж." : "Жен.")
-                </div>
-            </div>
-        </div>
-    </div>
+    <vc:form-questionnaire model="@(new FormQuestionnaireViewModel(){Person = Model.Person})"/>
 
     <div id="questionnaire">
         <div id="Answers" class="questions mt-5">

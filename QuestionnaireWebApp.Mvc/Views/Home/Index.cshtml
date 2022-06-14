@@ -1,4 +1,4 @@
-﻿@using QuestionnaireWebApp.Models
+﻿@using QuestionnaireWebApp.Views.Shared.Components.Questionnaire
 
 @model IEnumerable<QuestionnaireViewModel> 
 
@@ -26,27 +26,8 @@
         @foreach (var questionnaire in Model)
         {
             <div class="col-4 mb-3">
-                <div class="card text-center" style="height: 226px">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <a span data-bs-toggle="tooltip" title="Редактировать опросник" asp-action="Index" asp-route-questionnaireId="@questionnaire.Id" asp-controller="Constructor">
-                            <i class="fa-solid fa-pen-to-square text-warning edit" role="button"></i>
-                        </a>
-                        Опросник
-                        <i span data-bs-toggle="tooltip" title="Удалить опросник" class="fa-solid fa-trash-can text-danger remove" role="button" data-id="@questionnaire.Id"></i>
-                    </div>
-                    <div class="card-body d-flex flex-column justify-content-between">
-                        <h5 class="card-title">@questionnaire.Name</h5>
-                        <p class="card-text">@questionnaire.Description</p>
-                        <a class="btn btn-primary" asp-action="FormQuestionnaire" asp-route-id="@questionnaire.Id" asp-controller="Home">Пройти опрос</a>
-                    </div>
-                    <div class="card-footer text-muted d-flex justify-content-between align-items-center">
-                        <a data-bs-toggle="tooltip" title="Скачать опросник" asp-action="Download" asp-route-id="@questionnaire.Id" asp-controller="Home">
-                            <i class="fa-solid fa-file-arrow-down"></i>
-                        </a>
-                        Кол-во вопросов: @questionnaire.AmountQuestion
-                        <i data-id="@questionnaire.Id" span data-bs-toggle="tooltip" title="Поделиться опросником" role="button" class="fa-solid fa-link share"></i>
-                    </div>
-                </div>
+                <vc:questionnaire model="@questionnaire"/>
+                @*@await Component.InvokeAsync("Questionnaire", new{model=questionnaire})*@
             </div>
         }
     </div>
@@ -81,25 +62,10 @@
     <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.2.5/js/fileinput.min.js"></script>
     <!-- script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.2.5/themes/fas/theme.min.js"></script -->
     <script src="https://cdn.jsdelivr.net/gh/kartik-v/bootstrap-fileinput@5.2.5/js/locales/LANG.js"></script>
+    <script src="~/js/Shared/Components/Questionnaire/Index.js" asp-append-version="true"></script>
 
     <script>
-    
-        $('.share').click(function () {
-            let input = $('<input>');
-            $('body').append(input);
-            
-            let qId = $(this).data('id');
-            let host = location.protocol + '//' + location.host;
-            
-            input.val(host + '/Home/FormQuestionnaire/' + qId).select();
-            document.execCommand('copy');
-            input.remove();
-        })
         
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-          return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
         $.fn.fileinputBsVersion = "3.3.7"; // if not set, this will be auto-derived
                      
             // initialize plugin with defaults
@@ -108,32 +74,6 @@
             // with plugin options
             $("#FileImport").fileinput({'showUpload':false, 'previewFileType':'any'});
             
-    
-        $('.remove').click(function (){            
-            
-            let isReady = confirm('Вы уверены?')
-            if (!isReady) {
-                return;
-            }
-            
-            let questionnaireId = $(this).data('id');
-            
-            $.ajax({
-                url : '/Home/Delete/',
-                method : 'post',
-                data : {
-                    id : questionnaireId
-                },
-                success : function () {
-                    location.reload();
-                },
-                error : function (request, exception) {
-                    console.log(request);
-                    console.log(exception);
-                }
-            });
-        })
-        
     </script>
 }
 

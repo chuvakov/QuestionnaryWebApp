@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using QuestionnaireWebApp.Core;
-using QuestionnaireWebApp.Core.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +13,7 @@ builder.Services.AddDbContext<QuestionnaireContext>(x => x.UseNpgsql(connectionS
 builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
 //Если в проекте используется EFCore то нужно при Сериализации исключать циклическую зависимость
-JsonConvert.DefaultSettings = () => new JsonSerializerSettings()
+JsonConvert.DefaultSettings = () => new JsonSerializerSettings
 {
     ReferenceLoopHandling = ReferenceLoopHandling.Ignore
 };
@@ -39,7 +38,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    "default",
+    "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
