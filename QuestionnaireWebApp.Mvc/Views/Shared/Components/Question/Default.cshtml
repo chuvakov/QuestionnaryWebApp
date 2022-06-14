@@ -1,0 +1,58 @@
+@using QuestionnaireWebApp.Core.Enums
+@model QuestinaryWebApp.Views.Shared.Components.Question.QuestionViewModel
+
+@{
+    var isDisabled = Model.SelectedAnswers != null ? "disabled" : "";
+}
+
+<div class="card mb-3">
+    <div class="card-header">
+        Вопрос
+    </div>
+    <div class="card-body question" data-id="@Model.Question.Id" data-type="@Model.Question.Type">
+        <p class="question-name">@Model.Question.Name</p>
+
+        @switch (Model.Question.Type)
+        {
+            case QuestionType.Single:
+            case QuestionType.Many:
+                <ul class="answers list-group">
+                    @foreach (var variantAnswer in Model.Question.VariantAnswers)
+                    {
+                        var isChecked = Model.SelectedAnswers != null && Model.SelectedAnswers
+                            .Any(a => a.AnswerId == variantAnswer.Id) ? "checked" : "";
+
+                        switch (Model.Question.Type)
+                        {
+                            case QuestionType.Single:
+                                <li class="list-group-item d-flex align-items-center">
+                                    <input class="form-check-input me-1 answer-check" @isDisabled @isChecked data-id="@variantAnswer.Id" name="@Model.Question.Name" type="radio" value="" aria-label="...">
+                                    <span class="form-control form-control-sm answer-name">@variantAnswer.Name</span>
+                                </li>
+                                break;
+
+                            case QuestionType.Many:
+                                <li class="list-group-item d-flex align-items-center">
+                                    <input class="form-check-input me-1 answer-check" @isDisabled @isChecked data-id="@variantAnswer.Id" type="checkbox" name="@Model.Question.Name" value="" aria-label="...">
+                                    <span class="form-control form-control-sm answer-name">@variantAnswer.Name</span>
+                                </li>
+                                break;
+                        }
+                    }
+                </ul>
+                <div class="invalid-feedback">
+                    Не выбран ответ!
+                </div>
+
+                break;
+
+            case QuestionType.Our:
+                <p>Введите свой ответ</p>
+                <input class="form-control form-control-sm our-answer" value="@(Model.SelectedAnswers != null ? Model.SelectedAnswers.First().OurAnswer : "")" @isDisabled type="text">
+                <div class="invalid-feedback">
+                    Не введен ответ!
+                </div>
+                break;
+        }
+    </div>
+</div>

@@ -1,5 +1,5 @@
-@using QuestionnaireWebApp.Core.Enums
 @using QuestinaryWebApp.Views.Shared.Components.FormQuestionnaire
+@using QuestinaryWebApp.Views.Shared.Components.Question
 @model FormModalViewModel
 
 @{
@@ -7,65 +7,29 @@
 }
 
 <div class="modal-header">
-  <h5 class="modal-title">Просмотр пройденного опроса</h5>
-  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <h5 class="modal-title">Просмотр пройденного опроса</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 </div>
 <div class="modal-body">
-    
+
     <div class="text-center mt-3">
         <h5>@Model.QuestionnaireName</h5>
         <p>@Model.QuestionnaireDescription</p>
     </div>
-    
-    <vc:form-questionnaire model="@(new FormQuestionnaireViewModel(){Person = Model.Person})"/>
+
+    <vc:form-questionnaire model="@(new FormQuestionnaireViewModel {Person = Model.Person})"/>
 
     <div id="questionnaire">
         <div id="Answers" class="questions mt-5">
 
-            @foreach (var formAnswerGroup in Model.FormAnswers.GroupBy(x => x.Question))
+            @foreach (var formAnswerGroup in Model.FormAnswers.GroupBy(x => x.Question.Id))
             {
-                <div class="card mb-3">
-                    <div class="card-header">
-                        Вопрос
-                    </div>
-                    <div class="card-body question">
-                        <p class="question-name">@formAnswerGroup.Key.Name</p>
-
-                        @switch (formAnswerGroup.Key.Type)
-                        {
-
-                            case QuestionType.Single:
-                            case QuestionType.Many:
-                                <ul class="answers list-group">
-                                    @foreach (var variantAnswer in formAnswerGroup.Key.VariantAnswers)
-                                    {
-                                        switch (formAnswerGroup.Key.Type)
-                                        {
-                                            case QuestionType.Single:
-                                                <li class="list-group-item d-flex align-items-center">
-                                                    <input class="form-check-input me-1 answer-check" type="radio" disabled @(formAnswerGroup.Any(x => x.Answer.Name == variantAnswer.Name) ? "checked" : "")>
-                                                    <span class="form-control form-control-sm answer-name">@variantAnswer.Name</span>
-                                                </li>
-                                                break;
-
-                                            case QuestionType.Many:
-                                                <li class="list-group-item d-flex align-items-center">
-                                                    <input class="form-check-input me-1 answer-check" type="checkbox" disabled @(formAnswerGroup.Any(x => x.Answer.Name == variantAnswer.Name) ? "checked" : "")>
-                                                    <span class="form-control form-control-sm answer-name">@variantAnswer.Name</span>
-                                                </li>
-                                                break;
-                                        }
-                                    }
-                                </ul>
-                                break;
-
-                            case QuestionType.Our:
-                                <p>Введите свой ответ</p>
-                                <input class="form-control form-control-sm our-answer" type="text" disabled value="@formAnswerGroup.First().OurAnswer">
-                                break;
-                        }
-                    </div>
-                </div>
+                var questionModel = new QuestionViewModel
+                {
+                    Question = formAnswerGroup.First().Question,
+                    SelectedAnswers = formAnswerGroup.ToArray()
+                };
+                <vc:question model="@questionModel"/>
             }
         </div>
     </div>

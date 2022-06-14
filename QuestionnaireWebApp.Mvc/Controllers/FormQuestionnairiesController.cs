@@ -57,6 +57,7 @@ public class FormQuestionnairiesController : Controller
                 .ThenInclude(x => x.Answer)
                 .Include(x => x.FormAnswers)
                 .ThenInclude(x => x.Question)
+                .ThenInclude(x => x.AnswerVariants)
                 .FirstOrDefault(x => x.Id == id);
 
             var model = _mapper.Map<FormModalViewModel>(form);
